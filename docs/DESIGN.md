@@ -1,77 +1,72 @@
 # PetBuddy — Design Document
 
 Status: Draft v0.1
-Target platform: macOS 13+ (Ventura and later)
-License: MIT (planned)
-Distribution: Open source, direct download with Developer ID signing
+Target: macOS 13+ (Ventura and later)
+License: MIT
 
 ---
 
 ## 1. Vision
 
-PetBuddy is a desktop pet that lives on your screen as a reminder that people love you. When a friend messages you, your pet reacts. When a friend sends you a toy or treat, your pet walks to wherever they placed it. It is social, ambient, and explicitly not a productivity tool, notification center, or data collector.
+PetBuddy is ambient. It sits on your screen quietly, occasionally doing something charming, and reacts when the world reaches out. It is not a notification center. It is not a productivity tool. It does not know who you are or what you do. It just reminds you that other people exist and occasionally think of you.
 
-The product is a pet factory: a runtime into which anyone can drop a new species (puppy, cat, rabbit, axolotl), a new behavior, or a new messaging integration. The core team ships a high-quality default pet and a small set of integrations; the ecosystem does the rest.
+The product is a **pet factory**: a runtime into which anyone can drop a new species, a new behavior, or a new messaging integration. The core team ships one high-quality pet and a small set of integrations; the ecosystem does the rest.
 
 ### Guiding principles
-1. Privacy by construction, not by promise. No telemetry. No analytics. Messaging payloads are end-to-end encrypted. The only network traffic is what the user's integrations require.
-2. Charming over functional. Every animation, sound, and interaction should feel warm. If a design decision is between "useful" and "delightful," pick delightful.
-3. Pluggable from day one. Even in the MVP, pets, behaviors, and integrations are separate modules talking through stable interfaces. Adding a cat should not require changing puppy code.
-4. Zero infrastructure in v1. The MVP has no backend servers. P2P uses copy-paste invite codes.
 
-## 2. Non-goals
+1. **Privacy by construction.** No telemetry. No analytics. E2E encryption. The only network traffic is what the user's integrations require.
+2. **Ambient, not demanding.** Every decision should reduce attention demand, never increase it. The pet should never interrupt — it only reacts.
+3. **Pluggable from day one.** Pets, behaviors, and integrations are separate modules talking through stable interfaces. Adding a cat costs one new package.
+4. **Zero infrastructure in v1.** No backend servers. P2P uses copy-paste invite codes.
 
-- Cross-platform support in v1 (macOS only)
-- iOS/iPadOS companion app in v1 (designed for, shipped later)
-- Productivity features (task management, reminders, calendar)
-- Group chat with more than two pets
-- Monetization of any kind
+---
 
-## 3. System overview
+## 2. System overview
 
 ```
-┌───────────────────────────────────────────────────────────────┐
-│                        PetBuddy App                            │
-│  ┌─────────────────────────────────────────────────────────┐  │
-│  │               Overlay Window (NSPanel)                   │  │
-│  │        ╭─────────────╮                                   │  │
-│  │        │  🐶  Pet    │  ← AnimationRenderer              │  │
-│  │        ╰─────────────╯                                   │  │
-│  └─────────────────────────────────────────────────────────┘  │
-│                              ▲                                 │
-│                              │ PetEvent                        │
-│  ┌───────────────────────────┴────────────────────────────┐   │
-│  │                      EventBus                           │   │
-│  └────┬──────────┬──────────┬──────────┬──────────────────┘   │
-│       │          │          │          │                        │
-│  ┌────▼────┐ ┌──▼────┐ ┌──▼─────┐ ┌──▼──────────┐             │
-│  │ Slack   │ │Telegram│ │ Local  │ │ P2P         │             │
-│  │ Bot     │ │ Bot    │ │ Toys   │ │ Transport   │             │
-│  └─────────┘ └────────┘ └────────┘ └─────────────┘             │
-│  ┌──────────────────────────────────────────────────────────┐ │
-│  │         Identity (Ed25519 keypair in Keychain)           │ │
-│  └──────────────────────────────────────────────────────────┘ │
-└───────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────┐
+│                         PetBuddy App                              │
+│  ┌────────────────────────────────────────────────────────────┐ │
+│  │              Overlay Window (NSPanel)                        │ │
+│  │         ┌─────────────┐                                      │ │
+│  │         │  Pet Sprite  │  ← AnimationRenderer                 │ │
+│  │         └─────────────┘                                      │ │
+│  └────────────────────────────────────────────────────────────┘ │
+│                              ▲                                    │
+│                         PetEvent                                 │
+│  ┌────────────────────────┴───────────────────────────────────┐ │
+│  │                         EventBus                             │ │
+│  └──────┬──────────┬───────────┬───────────┬──────────────────┘ │
+│         │          │           │           │                       │
+│    ┌────▼───┐ ┌───▼────┐ ┌───▼─────┐ ┌──▼───────────┐          │
+│    │ Slack  │ │Telegram │ │  Local  │ │ P2P          │          │
+│    │  Bot   │ │  Bot    │ │  Toys   │ │ Transport    │          │
+│    └────────┘ └─────────┘ └─────────┘ └──────────────┘          │
+│                                                                   │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │              Identity (Ed25519 keypair in Keychain)        │   │
+│  └──────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
-Event-driven, single-process. Integrations and the P2P transport emit normalized `PetEvent`s onto the `EventBus. The Pet consumes events through its `BehaviorEngine` and renders via its `AnimationRenderer`.
+Event-driven, single-process. Integrations emit normalized `PetEvent`s onto the `EventBus`. The `Pet` consumes events through its `BehaviorEngine` and renders via its `AnimationRenderer`. The renderer knows nothing about integrations.
 
-## 4. Core abstractions
+---
 
-Four protocols define the system. Everything else plugs into these.
+## 3. Core abstractions
+
+Four protocols. Everything else plugs into these.
 
 ```swift
-// MARK: - Pet
+// MARK: Pet
 
-/// Blueprint loaded from a pet pack on disk.
 public protocol PetBlueprint {
-    var id: String { get }                  // "com.petbuddy.puppy.golden"
-    var species: Species { get }            // .puppy, .cat, .rabbit, .custom(String)
-    var displayName: String { get }         // "Goldie"
-    var renderer: RendererKind { get }       // .rive | .lottie | .spriteSheet
+    var id: String { get }
+    var species: Species { get }
+    var displayName: String { get }
+    var renderer: RendererKind { get }   // .spritesheet | .lottie | .rive
     var states: [StateKey: StateDescriptor] { get }
     var sounds: [SoundKey: URL] { get }
-
     func makeBehaviorEngine() -> BehaviorEngine
 }
 
@@ -90,7 +85,7 @@ public final class Pet: ObservableObject {
     }
 }
 
-// MARK: - Events
+// MARK: Events
 
 public enum PetEvent: Sendable {
     case incomingMessage(IncomingMessage)
@@ -103,16 +98,16 @@ public enum PetEvent: Sendable {
 }
 
 public struct IncomingMessage: Sendable, Codable {
-    public let platform: Platform              // .slack, .telegram, .peerToPeer
-    public let fromDisplay: String             // "Anika", "@sundar", etc.
-    public let preview: String                 // short text, max 120 chars
+    public let platform: Platform   // .slack, .telegram, .peerToPeer
+    public let fromDisplay: String   // "Anika", "@sundar", etc.
+    public let preview: String       // max 120 chars
     public let timestamp: Date
 }
 
-// MARK: - Integrations
+// MARK: Integrations
 
 public protocol IntegrationAdapter: AnyObject, Sendable {
-    static var identifier: String { get }      // "slack.bot", "telegram.bot"
+    static var identifier: String { get }   // "slack.bot", "telegram.bot"
     static var displayName: String { get }
 
     var events: AsyncStream<PetEvent> { get }
@@ -122,7 +117,7 @@ public protocol IntegrationAdapter: AnyObject, Sendable {
     func disconnect() async
 }
 
-// MARK: - Rendering
+// MARK: Rendering
 
 public protocol AnimationRenderer: AnyObject {
     associatedtype RendererView: NSView
@@ -135,27 +130,26 @@ public protocol AnimationRenderer: AnyObject {
 }
 ```
 
-Note: `BehaviorEngine` is a concrete class in v1 (hardcoded Swift behaviors per species). In v2 it becomes a protocol with a `JavaScriptCoreBehaviorEngine` implementation for third-party scripting. Designing it as a class today, extractable to a protocol later, is cheap.
+`BehaviorEngine` is a concrete class in v1 (hardcoded Swift per species). In Phase 2 it becomes a protocol with a `JavaScriptCore` implementation for third-party scripting.
 
-## 5. Pet pack format
+---
 
-A pet pack is a directory ending in `.petpack`. It contains a `manifest.json` and asset files. The manifest declares which renderer to use; the renderer loads its native assets.
+## 4. Pet pack format
+
+A `.petpack` is a directory bundle. Drop it into `Pets/`, it loads.
 
 ```
-Goldie.petpack/
-├── manifest.json
+YourPet.petpack/
+├── manifest.json        ← schema v1 (see PETPACK_SPEC.md)
+├── preview.png          ← 2×2 grid, shown in pet picker UI
 ├── assets/
-│   ├── goldie.riv              (if renderer = rive)
-│   ├── idle.json               (if renderer = lottie)
-│   ├── sheet.png               (if renderer = spritesheet)
-│   └── frames.json
-├── sounds/
-│   ├── bark.wav
-│   └── whine.wav
-└── preview.png                 (for UI picker)
+│   ├── sheet.png        ← spritesheet renderer
+│   ├── frames.json      ← frame atlas
+│   └── sounds/          ← CC0 or original
+│       └── *.wav
 ```
 
-### Manifest schema (v1)
+### Manifest (v1)
 
 ```json
 {
@@ -166,7 +160,6 @@ Goldie.petpack/
   "author": "Anthropic Open Source",
   "license": "CC-BY-4.0",
   "renderer": "spritesheet",
-
   "states": {
     "idle":  { "frames": [0,1,2,3],    "fps": 6,  "loop": true  },
     "walk":  { "frames": [4,5,6,7],    "fps": 12, "loop": true  },
@@ -174,354 +167,239 @@ Goldie.petpack/
     "sleep": { "frames": [12,13],      "fps": 2,  "loop": true  },
     "alert": { "frames": [14,15],      "fps": 8,  "loop": false }
   },
-
   "sounds": {
-    "bark":  "sounds/bark.wav",
-    "whine": "sounds/whine.wav"
+    "bark":  "sounds/bark.wav"
   },
-
   "personality": {
-    "baseState":   "idle",
-    "walkSpeed":   80,
-    "reactRange":  400,
-    "friendlinessToStrangers": 0.7
+    "baseState":    "idle",
+    "walkSpeed":    80,
+    "reactRange":   400
   }
 }
 ```
 
-Renderer-specific fields live under states but vary by renderer:
+---
 
-- `"renderer": "rive"` — states maps state name → `{ "input": "state", "value": "idle" }` (Rive state machine inputs)
-- `"renderer": "lottie"` — states maps state name → `{ "file": "idle.json", "loop": true, "speed": 1.0 }`
-- `"renderer": "spritesheet"` — as shown above
+## 5. Renderer architecture
 
-A JSON Schema file will be published alongside the code (`petpack-schema.v1.json`) so contributors can validate packs locally.
+| Renderer | Backend | Asset | Ships in |
+|----------|---------|-------|----------|
+| SpriteSheetRenderer | CAAnimation + NSImageView | sheet.png + frames.json | v0.1 |
+| LottieRenderer | airbnb/lottie-ios | one .json per state | Phase 2 |
+| RiveRenderer | rive-app/rive-ios | single .riv file | Phase 3 |
 
-## 6. Animation renderer architecture
+SpriteSheetRenderer is the only live implementation in MVP. Lottie and Rive are stubbed behind the protocol — adding them costs one new package, changes nothing else.
 
-Three concrete renderers ship, all conforming to `AnimationRenderer`:
+Frame stepping: `CADisplayLink` drives a frame index counter. At each step, the correct sub-rect of `sheet.png` is extracted and set on the `NSImageView.image`.
 
-| Renderer | Backend | Pet pack asset | Best for |
-|----------|---------|----------------|----------|
-| SpriteSheetRenderer | CAAnimation over NSImageView | sheet.png + frame ranges | Pixel-art pets, low contributor barrier |
-| LottieRenderer | [airbnb/lottie-ios](https://github.com/airbnb/lottie-ios) | one .json per state | Vector pets from After Effects |
-| RiveRenderer | [rive-app/rive-ios](https://github.com/rive-app/rive-ios) | single .riv file | Reactive pets with complex state machines |
+---
 
-### v1 ships with
-SpriteSheetRenderer fully implemented. LottieRenderer and RiveRenderer stubbed behind the protocol but not wired (they're a ~1-week each task post-MVP). The default puppy is a sprite-sheet pet using free assets from [Kenney.nl](https://kenney.nl) as a starting point, with original art commissioned later.
+## 6. Integration adapters
 
-### Why this split works
+### 6.1 Slack — Socket Mode
 
-The renderer doesn't know about integrations or events. It has exactly one job: show the pet in the right state at the right position. State transitions come from the BehaviorEngine. This means adding Rive in v0.5 is a drop-in that zero other code depends on.
+1. Create a Slack app from `integrations/slack/manifest.yaml`
+2. Install to workspace → copy bot token (`xoxb-...`) and app token (`xapp-...`)
+3. Paste into PetBuddy → Settings → Integrations → Slack
+4. Invite `@petbuddy` to any channel
 
-## 7. Integration adapters
+Scopes: `chat:write`, `im:history`, `channels:history`, `app_mentions:read`
 
-### 7.1 Slack Bot Adapter
+Events: `message.im`, `message.channels`, `app_mention`
 
-Uses Slack Socket Mode — a WebSocket from Slack's servers to the user's Mac, no inbound webhook needed.
+Socket Mode reconnects automatically on disconnect (see Spike C in PROJECT_PLAN.md).
 
-User setup (documented in README):
-1. Go to api.slack.com/apps → Create New App → From manifest
-2. Paste `integrations/slack/manifest.yaml` from the PetBuddy repo
-3. Install to workspace → grab bot token (`xoxb-...`) and app token (`xapp-...`)
-4. Paste both into PetBuddy → Settings → Integrations → Slack
-5. Invite the bot (`/invite @petbuddy`) to any channel where you want your pet to react
+### 6.2 Telegram — Long polling
 
-Manifest declares scopes:
-- chat:write, im:history, channels:history, app_mentions:read
+1. Message @BotFather → `/newbot` → copy token
+2. Paste into PetBuddy → Settings → Integrations → Telegram
 
-Runtime:
+Long-polls `getUpdates` with a 30s timeout. Offset tracking prevents double-delivery.
 
-```swift
-public final class SlackBotAdapter: IntegrationAdapter {
-    public static let identifier = "slack.bot"
+### Why bot-only
 
-    private let appToken: String
-    private let botToken: String
-    private var socket: WebSocketTask?
+Bot tokens are explicitly created by the user. The app never holds Telegram account credentials or Slack user OAuth tokens. The pet reacts to messages sent *to the bot* — not to the user's personal DMs. Friends opt in; the pet is a channel, not a surveillance layer.
 
-    public func connect() async throws {
-        let url = try await openSocketModeURL()    // apps.connections.open
-        socket = URLSession.shared.webSocketTask(with: url)
-        socket?.resume()
-        Task { await readLoop() }
-    }
+---
 
-    private func readLoop() async {
-        // Decode envelope, ack with envelope_id, translate payload → PetEvent
-    }
-}
-```
+## 7. P2P transport
 
-Subscribed events: `message.im` (DMs to bot), `message.channels` (in channels the bot is in), `app_mention`.
+WebRTC data channels. Zero servers. Copy-paste invite codes.
 
-### 7.2 Telegram Bot Adapter
+Swift package: [`stasel/WebRTC`](https://github.com/stasel/WebRTC)
 
-Uses Telegram Bot API long polling.
-
-User setup:
-1. Message @BotFather on Telegram → `/newbot` → get token
-2. Paste token into PetBuddy → Settings → Integrations → Telegram
-3. Message the bot or add it to groups where your pet should react
-
-Runtime:
-
-```swift
-public final class TelegramBotAdapter: IntegrationAdapter {
-    public static let identifier = "telegram.bot"
-
-    private let token: String
-    private var offset: Int = 0
-    private var pollingTask: Task<Void, Never>?
-
-    public func connect() async throws {
-        pollingTask = Task { await pollLoop() }
-    }
-
-    private func pollLoop() async {
-        while !Task.isCancelled {
-            let updates = try? await getUpdates(offset: offset, timeout: 30)
-            for update in updates ?? [] {
-                offset = max(offset, update.updateId + 1)
-                if let msg = update.message {
-                    emit(.incomingMessage(IncomingMessage(
-                        platform: .telegram,
-                        fromDisplay: msg.from?.displayName ?? "someone",
-                        preview: msg.text?.prefix(120).description ?? "",
-                        timestamp: Date(timeIntervalSince1970: TimeInterval(msg.date))
-                    )))
-                }
-            }
-        }
-    }
-}
-```
-
-### Why bot-only (not user client)
-
-The "bot-only" decision means: the pet reacts to messages sent to the user's bot, not to the user's personal DMs. This is a deliberate scope and privacy choice:
-
-- Privacy: the app never holds user credentials for Telegram/Slack — only bot tokens the user explicitly created
-- Simplicity: no TDLib, no Slack user-token OAuth dance, no MTProto
-- Social framing: friends opt in by messaging your bot. The pet represents a *channel* your friends can reach you through, not a surveillance layer over your life
-- Limitation: this won't make the pet react to your normal incoming Slack/Telegram DMs. Accepted tradeoff for v1
-
-User-client mode (`TelegramUserClientAdapter` via TDLib) is a plausible v2 feature, gated behind a "power user" flag.
-
-## 8. P2P transport
-
-Pet-to-pet messaging uses WebRTC data channels with copy-paste signaling — zero servers.
-
-Swift package: [`stasel/WebRTC`](https://github.com/stasel/WebRTC) (prebuilt WebRTC.xcframework).
-
-### 8.1 Invite code format
-
-An invite encodes everything needed to establish a connection:
+### Invite code format
 
 ```
 PETBUDDY-v1:<base64url(zstd(json_payload))>
 ```
 
-Where json_payload is:
-
 ```json
 {
   "kind": "offer",
   "from": {
-    "pubkey": "ed25519:a1b2c3...",
+    "pubkey": "ed25519:...",
     "nickname": "Alice",
     "petId": "com.petbuddy.puppy.golden"
   },
-  "sdp": "v=0\r\no=- 123 456 IN IP4 0.0.0.0\r\n...",
-  "ice": [
-    "candidate:1 1 UDP 2122260223 192.168.1.5 54321 typ host",
-    "candidate:2 1 UDP 1686052607 203.0.113.7 54321 typ srflx ..."
-  ],
+  "sdp": "v=0\r\no=- ...",
+  "ice": ["candidate:1 1 UDP 2122260223 ..."],
   "createdAt": 1713456789,
   "ttlSeconds": 3600
 }
 ```
 
-The answer uses `"kind": "answer"` with the same shape. Invites typically encode to ~2–4 KB → 3–5 KB base64 → shareable as a long string. Clunky but functional.
+Invite codes compress to ~2–5 KB. This is the spike to verify in Week 1.
 
-### 8.2 Handshake flow
+### Handshake
 
 ```
-Alice                                                       Bob
-  │                                                          │
-  │  1. Create RTCPeerConnection, create data channel        │
-  │  2. Create SDP offer, start ICE gathering               │
-  │  3. Wait 2s or until ICE complete                       │
-  │  4. Bundle offer + pubkey + ICE → invite code           │
-  │─────────────── send via iMessage / etc ─────────────────▶│
-  │                                                          │
-  │                                 5. Paste invite code     │
-  │                                 6. Set remote description│
-  │                                 7. Create answer, ICE   │
-  │                                 8. Bundle → answer code   │
-  │◀────────────── send back via any channel ────────────────│
-  │                                                          │
-  │  9. Paste answer, set remote description                 │
-  │ 10. WebRTC completes connection                          │
-  │ 11. Data channel open                                    │
-  │                                                          │
-  │────────── encrypted app-level messages ─────────────────▶│
-  │◀──────────────────── (toys, treats) ─────────────────────│
+Alice                                                    Bob
+  │  1. Create RTCPeerConnection, data channel           │
+  │  2. Create SDP offer, gather ICE                     │
+  │  3. Wait 2s (or ICE complete)                        │
+  │  4. Bundle → PETBUDDY-v1:... invite code            │
+  │─────────────────── share via any channel ───────────▶ │
+  │                                                       │
+  │                              5. Paste invite          │
+  │                              6. Set remote desc       │
+  │                              7. Create answer         │
+  │                              8. Answer code back      │
+  │◀──────────────────────── same channel ────────────────│
+  │  9. Paste answer, set remote desc                     │
+  │ 10. WebRTC connection established                     │
+  │ 11. Data channel open                               │
+  │──────────── encrypted peer messages ─────────────────▶ │
 ```
 
-Known limitations of copy-paste signaling:
+Known limitations: both peers must be online simultaneously. NAT traversal fails for ~20% of strict NATs. Reconnection requires a new invite. Phase 2 adds a signaling relay.
 
-- Both peers must be online simultaneously for the handshake
-- Reconnection after disconnect requires a new handshake (same pair)
-- NAT traversal may fail without TURN; ~20–30% of connections across strict NATs will fail
-- Public STUN only for now (e.g., `stun.l.google.com:19302`). No TURN in v1
+### Message protocol
 
-These limitations are the price of zero infrastructure. v0.2 upgrade path is a tiny signaling relay that caches pubkey-addressed offers for later retrieval.
-
-### 8.3 Message protocol
-
-Once the data channel is open, peers exchange framed JSON messages. All messages are encrypted using Curve25519.KeyAgreement → ChaChaPoly sealed boxes with each friendship's session key.
+All messages encrypted with ChaChaPoly using a session key derived via X25519 + HKDF from the handshake.
 
 ```swift
 public enum PeerMessage: Codable, Sendable {
     case ping
     case pong
-    case nudge(text: String)                   // renders as thought bubble
+    case nudge(text: String)                 // thought bubble
     case toy(kind: ToyKind, position: LogicalPosition)
     case treat(kind: TreatKind, position: LogicalPosition)
-    case petState(state: StateKey)              // optional: show friend's pet mood
+    case petState(state: StateKey)           // show friend's pet mood
 }
 
 public enum LogicalPosition: Codable, Sendable {
-    case region(ScreenRegion)                  // v1: 9 cells
-    case normalized(x: Double, y: Double)       // v2
-    case anchor(SemanticAnchor)                // v3
+    case region(ScreenRegion)     // v1: 9-cell grid
+    case normalized(x: Double, y: Double)  // v2
+    case anchor(SemanticAnchor)   // v3
 }
 
 public enum ScreenRegion: String, Codable, Sendable {
     case topLeft, topCenter, topRight
-    case midLeft, center,    midRight
+    case midLeft, center, midRight
     case botLeft, botCenter, botRight
 }
 ```
 
-Coordinate translation is the receiver's responsibility. `LogicalPosition.resolve(on: NSScreen)` returns pixel coordinates appropriate to the local screen.
+---
 
-## 9. Identity & security
+## 8. Identity & security
 
-### Keypair
-On first launch, PetBuddy generates an Ed25519 signing keypair via `CryptoKit.Curve25519.Signing.PrivateKey`. The private key is stored in the macOS Keychain under access group `com.petbuddy.identity`, accessible only by this app. The public key is the user's stable identifier across devices (once CloudKit sync lands in v2).
-
-### Friendship keys
-
-When two users complete a copy-paste handshake, they derive a shared symmetric key via X25519 key agreement between their Ed25519 keys (converted to Curve25519). This key is stored in the Keychain keyed by peer pubkey. All PeerMessage payloads are encrypted with this key using ChaChaPoly.seal before being written to the WebRTC data channel.
-
-### What's trusted with what
+- On first launch: `CryptoKit.Curve25519.Signing.PrivateKey` generated, stored in macOS Keychain under `com.petbuddy.identity`
+- Public key = user's stable identifier across sessions
+- Friendship session keys derived via X25519 + HKDF at handshake time, stored in Keychain keyed by peer pubkey
+- All P2P payloads encrypted with ChaChaPoly before going over the wire
 
 | Component | Stores | Sees |
 |-----------|--------|------|
-| PetBuddy app | User's private key, friend pubkeys, friendship session keys, integration tokens | Everything (it's the user's own app) |
-| Slack / Telegram | Integration bot tokens | Messages sent to the bot (by design of the API) |
-| WebRTC relay/STUN | — | IP address pairs (STUN only; no content) |
-| Friend's PetBuddy | Our pubkey, shared session key | Payloads we explicitly send |
+| PetBuddy app | All keys, all tokens | Everything |
+| Slack / Telegram | Bot tokens only | Messages to the bot |
+| STUN server | — | IP address pairs (STUN only) |
+| Friend's PetBuddy | Our pubkey + session key | Only what we send |
 
-No PetBuddy-operated server exists in v1.
+No PetBuddy-operated server exists in v0.1.
 
-## 10. UI surfaces
+---
 
-Three surfaces, kept deliberately minimal:
+## 9. UI surfaces
 
-1. **Overlay window** — NSPanel with `.nonactivatingPanel`, `.borderless`, `collectionBehavior = [.canJoinAllSpaces, .stationary, .fullScreenAuxiliary]`, sized to the active screen. Hit-testing is opt-in per subview: the pet sprite catches clicks and drag events; everywhere else passes through to the app behind (`NSView.hitTest` returns `nil`).
+Three surfaces. Deliberately minimal.
 
-2. **Menu bar item** — NSStatusItem with a paw-print icon. Menu contains: pet status, open settings, pause/resume pet, quit.
+**1. Overlay window (NSPanel)**
+`.nonactivatingPanel`, `.borderless`, `collectionBehavior = [.canJoinAllSpaces, .stationary, .fullScreenAuxiliary]`. Full-screen, transparent. Hit-testing: pet sprite catches clicks; `NSView.hitTest` returns `nil` everywhere else → clicks pass through to the app behind.
 
-3. **Settings window** — Standard SwiftUI Settings scene. Tabs:
-   - General — pet picker, boot on login, sounds on/off
-   - Integrations — Slack, Telegram cards with token fields and status lights
-   - Friends — list of paired peers, "Invite a Friend" (generates code), "Add from Invite" (paste field)
-   - About — version, credits, link to repo
+**2. Menu bar (NSStatusItem)**
+Paw icon. Menu: pet status, open Settings, pause/resume pet, quit.
 
-## 11. Directory layout
+**3. Settings window (SwiftUI)**
+- General: pet picker, boot on login, sounds
+- Integrations: Slack + Telegram cards with token fields, Connect button, status light
+- Friends: paired peers list, Invite a Friend (generates code), Add from Invite (paste field)
+- About: version, credits, repo link
+
+---
+
+## 10. Directory layout
 
 ```
 PetBuddy/
-├── Package.swift                   (SPM manifest for libs)
+├── Package.swift
 ├── PetBuddy.xcodeproj/
-├── App/                            (SwiftUI app target)
+├── App/
 │   ├── PetBuddyApp.swift
 │   ├── OverlayWindow/
 │   ├── Settings/
 │   └── MenuBar/
 ├── Packages/
-│   ├── PetCore/                    (protocols, models, EventBus)
-│   │   ├── Sources/PetCore/
-│   │   └── Tests/PetCoreTests/
-│   ├── PetPack/                    (manifest loader, schema validation)
+│   ├── PetCore/                  ← protocols, models, EventBus
+│   ├── PetPack/                  ← manifest loader + schema validation
 │   ├── Renderers/
 │   │   ├── SpriteSheetRenderer/
-│   │   ├── LottieRenderer/         (stub in v1)
-│   │   └── RiveRenderer/           (stub in v1)
+│   │   ├── LottieRenderer/       (stub)
+│   │   └── RiveRenderer/          (stub)
 │   ├── Integrations/
 │   │   ├── SlackBot/
 │   │   └── TelegramBot/
-│   ├── P2PTransport/               (WebRTC + invite codec)
-│   └── Identity/                  (Keychain, keypairs)
+│   ├── P2PTransport/             ← WebRTC + invite codec
+│   └── Identity/                ← Keychain, keypairs
 ├── Pets/
-│   └── Goldie.petpack/            (default puppy — shipped with app)
+│   └── Goldie.petpack/          ← default pet (shipped)
 ├── integrations/
-│   └── slack/manifest.yaml         (user-installable Slack app manifest)
-├── docs/
-│   ├── DESIGN.md                   (this file)
-│   ├── PROJECT_PLAN.md
-│   ├── CONTRIBUTING.md
-│   ├── PETPACK_SPEC.md
-│   └── petpack-schema.v1.json
-└── README.md
+│   └── slack/manifest.yaml
+└── docs/
+    ├── DESIGN.md
+    ├── PROJECT_PLAN.md
+    ├── PETPACK_SPEC.md
+    ├── petpack-schema.v1.json
+    └── CONTRIBUTING.md
 ```
 
-Each package has its own tests and is buildable in isolation. This matters for the "factory" story — a pet renderer contributor should be able to open `Renderers/LottieRenderer/` and work without touching app code.
+Each package builds and tests in isolation.
 
-## 12. Decision log
+---
 
-| # | Decision | Alternatives considered | Reason |
-|---|----------|-------------------------|--------|
-| 1 | SwiftUI / AppKit hybrid, native Swift | Electron, Tauri, Unity | Best macOS feel, acceptable plugin story via JavaScriptCore later |
-| 2 | Open-source, direct distribution | Mac App Store | Sandbox too restrictive for overlay window and P2P; contributor-friendly |
-| 3 | Bot-only integrations for v1 | User-client access (TDLib, Slack user tokens) | Privacy, simplicity, smaller attack surface |
+## 11. Decision log
+
+| # | Decision | Alternatives | Reason |
+|---|----------|--------------|--------|
+| 1 | SwiftUI/AppKit hybrid native | Electron, Tauri, Unity | Best macOS feel; JS plugin story in Phase 2 |
+| 2 | MIT open source, Developer ID + Homebrew | Mac App Store | Sandbox too restrictive for overlay + P2P |
+| 3 | Bot-only integrations | TDLib, Slack user tokens | No user credentials; simpler; smaller surface |
 | 4 | Copy-paste P2P invite codes | Relay server, Nostr | Zero infra; upgrade path is clean |
-| 5 | Multi-renderer via AnimationRenderer protocol | Single renderer (pick one) | OSS contributors have different tools; cost is one protocol |
-| 6 | Ed25519 identity in Keychain | No identity in v1 | Pairs for free with later CloudKit sync + E2E encryption |
-| 7 | WebRTC data channels | QUIC, raw TCP, libp2p | Best hole-punching support, mature, good Swift wrapper |
-| 8 | Region-grid coordinates (9 cells) | Pixel coordinates, normalized | Resolution-agnostic, simple; upgrade path is additive |
+| 5 | Multi-renderer via protocol | Single renderer | Lottie/Rive additive; cost is one protocol |
+| 6 | Ed25519 keypair in Keychain | No identity | Free pairing with CloudKit sync later |
+| 7 | WebRTC data channels | QUIC, TCP, libp2p | Best NAT hole-punching; mature Swift wrapper |
+| 8 | 9-cell region grid | Pixel or normalized coords | Resolution-agnostic; simple; upgrade additive |
+| 9 | SpriteSheetRenderer v1 | Kenney voxel | Pixel art is faster to ship; swap later |
 
-## 13. Open questions
+---
 
-- How does a paired friendship persist across restarts when the only signaling is copy-paste? Likely answer: cache the last known ICE candidates on both sides and attempt direct reconnect at startup. If that fails, prompt for re-invite. Needs a spike in week 7.
-- What happens when the overlay window intersects fullscreen apps? `.fullScreenAuxiliary` should cover most cases but games and video players may hide it. Acceptable for v1; document as known.
-- Accessibility — screen readers on a pet? The sprite is decorative; thought bubbles should be readable via VoiceOver. Add in v0.9.
-- How are pets paused during focus modes / Do Not Disturb? Respect NSUserNotificationCenter DND state; pet goes to sleep. v0.9.
-- Pet pack signing — do we require signed packs for the built-in installer in v1? Leaning no for MVP (unsigned packs with a warning), yes for v1.0.
+## 12. Open questions
 
-## Appendix A — How to contribute a pet
-
-1. Fork the repo. Copy `Pets/Goldie.petpack/` to `Pets/YourPet.petpack/`.
-2. Edit `manifest.json`:
-   - Change `id` to a unique reverse-DNS string you control
-   - Set species, displayName, author, license
-   - Pick a renderer (`"spritesheet"`, `"lottie"`, or `"rive"`)
-3. Replace the assets in `assets/` with your art.
-4. Run `swift run petpack-validate Pets/YourPet.petpack` (ships as a CLI tool in v1).
-5. Open a PR. The default puppy, cat, and rabbit live in the main repo; third-party pets should link to their own repos from PETS.md.
-
-## Appendix B — Swift package dependencies (planned)
-
-| Package | Purpose | License |
-|---------|---------|---------|
-| stasel/WebRTC | WebRTC bindings | BSD-3 |
-| airbnb/lottie-ios | Lottie renderer | Apache-2 |
-| rive-app/rive-ios | Rive renderer | MIT |
-| apple/swift-crypto | Curve25519 / ChaChaPoly | Apache-2 |
-| facile-it/zstd-swift or similar | Invite code compression | BSD |
-| apple/swift-argument-parser | CLI tools | Apache-2 |
-
-No analytics, no telemetry, no networking packages beyond the above.
+| Question | Current answer | Phase |
+|----------|---------------|-------|
+| How does P2P reconnect after restart? | Cache last ICE candidates; retry on launch; fall back to new invite | Week 7 spike |
+| Overlay vs fullscreen apps? | `.fullScreenAuxiliary` covers most; games may hide it | Acceptable for v0.1 |
+| Accessibility for thought bubbles? | VoiceOver should read them; add accessibility labels in Phase 3 | Phase 3 |
+| Pet pauses during DND? | Respect `NSUserNotificationCenter` DND state; pet goes to sleep | Phase 3 |
+| Pet pack signing? | Unsigned with warning for MVP; signed for v1.0 | Phase 1 |

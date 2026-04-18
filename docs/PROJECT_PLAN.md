@@ -1,225 +1,203 @@
 # PetBuddy — Project Plan
 
-Companion to: DESIGN.md
-Assumed team size: 1–2 engineers + 1 artist (part-time)
-MVP target: ~10 weeks of focused work
+Companion to: [DESIGN.md](DESIGN.md)
+Assumed team: 1–2 engineers + 1 artist (part-time)
+MVP target: ~10 weeks
 
 ---
 
-## 1. MVP scope (v0.1)
+## 1. MVP scope
 
-Ships when the following all work end-to-end:
+Ships when all eight of these work end-to-end:
 
-- [ ] Launch app → sprite-sheet puppy appears on screen, wandering idly
-- [ ] Click the pet → it reacts (small animation + thought bubble)
-- [ ] Drag a toy onto the screen → pet walks to it
-- [ ] Set up a Slack bot → messages to the bot make the pet react
-- [ ] Set up a Telegram bot → messages to the bot make the pet react
-- [ ] Generate a P2P invite code → friend pastes it → direct connection
-- [ ] Send a toy to your friend over P2P → their pet walks to that screen region
-- [ ] Quit app → pet disappears; relaunch → pet returns with same identity
+- [ ] Launch app → puppy appears, wandering idly
+- [ ] Click pet → animation + thought bubble + sound
+- [ ] Drag a toy → pet walks to it, plays happy
+- [ ] Slack bot configured → pet reacts to bot messages
+- [ ] Telegram bot configured → pet reacts to bot messages
+- [ ] Generate P2P invite → paste on another Mac → direct connection
+- [ ] Send toy over P2P → friend's pet walks to that screen region
+- [ ] Quit and relaunch → pet returns with same identity
 
-Explicitly out of scope for MVP (listed so the teammate doesn't scope-creep):
+**Out of scope (enforced to prevent creep):** multiple pets, Lottie/Rive, second species, CloudKit, JS scripting, third-party plugins, iOS, auto-update.
 
-- Multiple simultaneous pets
-- Rive or Lottie renderer (stubs only)
-- Cat, rabbit, or any second species
-- CloudKit identity sync
-- JavaScriptCore behavior scripting
-- Third-party integration plugins
-- Signed pet pack installer
-- iOS companion
-- Auto-update
+---
 
 ## 2. Phase overview
 
 | Phase | Version | Focus | Duration |
 |-------|---------|-------|----------|
-| 1 | v0.1 (MVP) | Foundation + one pet + bots + P2P copy-paste | ~10 weeks |
-| 2 | v0.2 | Signaling relay, persistent friendships, cat species | ~8 weeks |
-| 3 | v0.3 | Lottie renderer, semantic positioning, DND integration | ~6 weeks |
-| 4 | v0.4 | Rive renderer, CloudKit sync, iOS companion beta | ~10 weeks |
-| 5 | v0.5 | JavaScriptCore behavior scripting, pet pack installer | ~8 weeks |
+| 1 | v0.1 MVP | Foundation + one pet + bots + P2P | ~10 weeks |
+| 2 | v0.2 | Signaling relay, persistent friendships, cat | ~8 weeks |
+| 3 | v0.3 | Lottie renderer, semantic positioning, DND | ~6 weeks |
+| 4 | v0.4 | Rive renderer, CloudKit sync, iOS companion | ~10 weeks |
+| 5 | v0.5 | JS behavior scripting, pet pack installer | ~8 weeks |
 
-Phases 2+ are rough. This doc mostly concerns Phase 1.
+This plan covers Phase 1 only.
 
-## 3. Week-by-week (Phase 1)
+---
 
-Each week has a concrete Definition of Done. If the DoD isn't met, don't start the next week's work — the later weeks depend on earlier foundations.
+## 3. Week-by-week
+
+If the DoD for a week isn't met, do not start the next week. Later weeks depend on earlier foundations.
 
 ### Week 1 — Project skeleton
 
-- Xcode project, SPM sub-packages per DESIGN.md §11
-- PetCore package with `PetEvent`, `IncomingMessage`, `LogicalPosition` defined and tested
-- `EventBus` implemented as an `AsyncStream` multiplexer
-- CI set up (GitHub Actions running `swift test` on all packages)
-- MIT license, README stub, CONTRIBUTING stub
+**Spike A runs this week** (half a day). Everything else below.
 
-**DoD:** `swift test` passes on all packages. CI is green. Repo is public.
+- SPM project structure matching DESIGN.md §10
+- `PetCore` package: `PetEvent`, `IncomingMessage`, `LogicalPosition`, `ScreenRegion` defined and tested
+- `EventBus` as `AsyncStream` multiplexer — all adapters and the pet subscribe here
+- `Package.swift` with all planned packages listed (not all implemented yet)
+- GitHub Actions CI: `swift test` on all packages
+- MIT license, this plan, contributing guide
 
-### Week 2 — Overlay window & menu bar
+**Spike A — WebRTC copy-paste viability** (do this first):
+```
+- Create RTCPeerConnection, gather ICE candidates
+- Measure: does a complete round finish in <5s on a typical home network?
+- Encode offer as PETBUDDY-v1:... code — is it <5 KB?
+- Open a data channel between two local processes
+- Report: pass or fail
+```
+If fail → delay Phase 1 P2P track, build a tiny signaling relay instead.
 
-- NSPanel subclass with correct style mask, collection behavior, hit-testing
-- Transparent full-screen panel that lets clicks through except on the pet
-- Menu bar NSStatusItem with paw icon, pause/quit/settings menu
-- Settings window shell (tabs: General / Integrations / Friends / About — all empty for now)
+**DoD:** `swift test` passes. CI green. Spike A pass/fail logged. Repo is private.
+
+### Week 2 — Overlay window + menu bar
+
+**Spike B runs this week** (half a day).
+
+- NSPanel subclass: `.nonactivatingPanel`, `.borderless`, `collectionBehavior = [.canJoinAllSpaces, .stationary, .fullScreenAuxiliary]`, transparent
+- Full-screen panel with `NSView.hitTest` returning `nil` everywhere except the pet sprite
+- NSStatusItem with paw icon: menu with pet status, open Settings, pause, quit
+- Settings window shell: General / Integrations / Friends / About tabs (empty)
 - Boot-on-login toggle (General tab)
+- Do a dummy notarization to catch issues early
 
-**DoD:** App launches to menu bar. Overlay panel is present and transparent. Clicks on the desktop reach the desktop. Settings opens via menu.
+**Spike B — NSPanel click-through**: Build a throwaway app with one colored rectangle on a transparent full-screen panel. Verify: desktop clicks pass through; only the rectangle catches clicks.
+
+**DoD:** App lives in menu bar. Transparent overlay panel present. Desktop clicks reach the desktop. Settings opens. Spike B result logged.
 
 ### Week 3 — Sprite-sheet renderer
 
 - `AnimationRenderer` protocol finalized
-- `SpriteSheetRenderer` implementation (`CAAnimation`-based frame stepping)
-- PetPack loader with JSON schema validation
-- Test pet pack from Kenney.nl assets (free pixel-art puppy — or use Goldie.petpack)
-- Draggable sprite inside the overlay panel
-- State transitions: idle → walk → idle
+- `SpriteSheetRenderer`: CADisplayLink-driven frame stepping over NSImageView
+- PetPack loader: load `.petpack`, validate manifest against `petpack-schema.v1.json`
+- Load `Pets/Goldie.petpack/` — confirm all 16 frames render
+- Pet draggable within overlay panel
+- State machine: idle ↔ walk
 
-**DoD:** The puppy appears on screen, plays idle, walks when clicked, returns to idle. Pet can be dragged by the user.
+**DoD:** Puppy on screen. Idle animation playing. Clicking starts a walk. Drag repositions the pet.
 
-### Week 4 — Local toys and behaviors
+### Week 4 — Behaviors + toys
 
-- Toy drag-and-drop from a small "toy tray" HUD (show/hide with hotkey)
-- Pet pathfinding: simple lerp toward target, face direction
-- "Happy" state triggered when pet reaches a toy
-- Idle wandering behavior (random short walks)
-- Sound effects hooked up (bark on click, happy sound on toy)
-- `BehaviorEngine` class gets its shape — event dispatch table per state
+- Toy tray HUD (show/hide with hotkey, default ⌘⇧T)
+- Pet pathfinding: lerp toward target, face direction of movement
+- `BehaviorEngine`: event dispatch table keyed by `(currentState, event) → newState`
+- Trigger "happy" when pet reaches a toy
+- Idle wandering: random walks every 30–90 seconds
+- Sound effects: bark on click, happy sound on toy pickup
+- Thought bubble: appears above pet with sender name on `incomingMessage`
 
-**DoD:** Drag a toy from the tray to a location. Pet walks to it, plays happy, picks it up. Pet occasionally wanders on its own.
+**DoD:** Pet wanders on its own. Drag a toy → pet walks to it → plays happy. Click → bark + thought bubble.
 
-### Week 5 — Slack bot integration
+### Week 5 — Slack bot
 
 - `IntegrationAdapter` protocol finalized
-- `SlackBotAdapter` implementing Socket Mode
-- Token storage in Keychain
-- Slack manifest file committed to `integrations/slack/manifest.yaml`
-- Settings → Integrations → Slack card with token fields, "Connect" button, status light
-- Pet reacts to `message.im` and `app_mention` events with a thought bubble showing the sender's name
+- `SlackBotAdapter`: Socket Mode WebSocket, token from Keychain
+- `integrations/slack/manifest.yaml` committed
+- Settings → Integrations → Slack: token fields, Connect button, status light
+- Parse `message.im`, `message.channels`, `app_mention` → emit `PetEvent.incomingMessage`
 
-**DoD:** User can paste both tokens, click Connect, see green light, send a message to the bot from Slack, and watch the pet display a thought bubble.
+**Spike C — Socket Mode reconnection**: Force-disconnect the WebSocket. Verify the adapter reconnects automatically within 5s and resumes receiving events.
 
-### Week 6 — Telegram bot integration
+**DoD:** Paste tokens → Connect → green light. Message the bot from Slack → pet shows a thought bubble. Spike C pass/fail logged.
 
-- `TelegramBotAdapter` with long-polling loop
-- Token storage in Keychain (same pattern as Slack)
-- Settings → Integrations → Telegram card
+### Week 6 — Telegram bot
+
+- `TelegramBotAdapter`: long-polling loop, offset tracking, Keychain token
+- Settings → Integrations → Telegram card (mirrors Slack UX)
 - Pet reacts to messages to the bot
-- README section explaining bot creation via @BotFather
+- README: @BotFather setup instructions
 
-**DoD:** User creates a bot, pastes token, connects, sends message to the bot, pet reacts. Same UX quality as Slack.
+**DoD:** Create a Telegram bot → paste token → Connect → green light. Message the bot → pet reacts. Same quality as Slack.
 
-### Week 7 — Identity & P2P transport foundation
+### Week 7 — Identity + P2P transport foundation
 
-- Curve25519.Signing.PrivateKey generated on first launch, stored in Keychain
-- Identity package exposing pubkey + signing APIs
-- Integrate stasel/WebRTC package
-- `P2PTransport` class: creates RTCPeerConnection, opens data channel, performs offer/answer
-- Encode/decode invite codes: JSON → zstd → base64url → `PETBUDDY-v1:...` string
-- Unit tests for the codec (roundtrip + malformed input)
-- Public STUN configured; no TURN yet
+- Ed25519 keypair generated on first launch via `CryptoKit.Curve25519.Signing.PrivateKey` → stored in Keychain under `com.petbuddy.identity`
+- Identity package: expose `pubkey`, `sign(data:)`, `deriveSharedSecret(peer:)` APIs
+- Integrate `stasel/WebRTC`
+- `P2PTransport`: RTCPeerConnection, data channel, offer/answer
+- Invite codec: JSON → zstd → base64url → `PETBUDDY-v1:...`
+- Unit tests: roundtrip encode/decode, malformed input rejection
+- STUN: `stun.l.google.com:19302`. No TURN.
 
-**DoD:** Two instances of the app (run locally with different Keychain access groups, or on two Macs) can exchange invite codes and establish a WebRTC data channel. Logs show the channel opening.
+**DoD:** Two processes exchange invite codes. Data channel opens. Logs confirm ICE candidates gathered and connection established.
 
-### Week 8 — P2P pairing UI and peer messages
+### Week 8 — P2P pairing UI + peer messages
 
-- Settings → Friends tab with "Invite a Friend" and "Add from Invite" actions
-- Invite generation sheet: shows the code, copy button, QR code
-- Answer paste sheet
-- After pairing, derive shared session key (X25519 + HKDF)
-- `PeerMessage` codec over the data channel with ChaChaPoly sealing
-- Ping/pong for keepalive
-- Remote-toy and remote-nudge messages delivered to the pet
+- Settings → Friends: "Invite a Friend" generates + displays code with copy button
+- "Add from Invite": paste field, parses and validates `PETBUDDY-v1:...`
+- X25519 + HKDF → shared session key stored in Keychain
+- ChaChaPoly sealed boxes over all data channel messages
+- Ping/pong keepalive every 30s
+- Remote toy → pet walks to `LogicalPosition.region`
+- Remote nudge → thought bubble with peer's message
 
-**DoD:** Two users complete the paste dance. One clicks "Send Toy" targeting `.bottomRight`. The other user's pet walks to the bottom-right of their screen. Messages are encrypted end-to-end (verified by packet inspection).
+**DoD:** Complete the paste dance with a friend. Send a toy → their pet walks to `.botRight`. Packet inspection confirms ciphertext.
 
-### Week 9 — Polish pass
+### Week 9 — Polish
 
-- Settings polish (icons, copy, error states)
-- Loading and error states throughout
-- Handling disconnect/reconnect (friend offline → sad thought bubble, retry logic)
-- Crash-free session test: leave app running for 8 hours with ambient integration traffic
-- Homebrew cask scaffolding
-- Notarization via GitHub Actions
+- Settings: icons, error states, copy throughout
+- Loading states: spinner while connecting, error banners with retry
+- Disconnect: friend offline → pet shows sad thought bubble + retry logic
+- 8-hour soak test: app running with Slack + Telegram + P2P traffic
+- Homebrew cask scaffold
 - CONTRIBUTING.md, PETPACK_SPEC.md, code of conduct
+- First notarization run (real, not dummy this time)
 
-**DoD:** Release candidate build is notarized, installable via Homebrew tap, passes an 8-hour soak test with Slack/Telegram/P2P traffic flowing, and has no known P0 bugs.
+**DoD:** Notarized .dmg. Soak test passes. No P0 bugs known.
 
-### Week 10 — Beta release and launch prep
+### Week 10 — Beta release
 
-- Publish v0.1.0-beta GitHub release with notarized .dmg
+- Tag `v0.1.0-beta`
+- GitHub release with .dmg + installation instructions
 - README with screenshots/GIFs
-- Landing page (static HTML, free host — GitHub Pages)
 - Share with ~10 friendly beta testers
-- Triage first 48 hours of feedback
-- Tag v0.1.0 after critical fixes
+- Triage 48 hours of feedback
+- Tag `v0.1.0` after critical fixes
 
-**DoD:** A non-technical beta tester on a fresh Mac can install the app, create a Telegram bot, and see their pet react to a friend's message — all from the README alone, without asking for help.
+**DoD:** A non-technical person on a fresh Mac installs from the README alone, sets up a Telegram bot, and gets their pet to react — without asking for help.
 
-## 4. Risks and spikes
+---
 
-Three areas are genuinely uncertain and should be spiked in the first two weeks to de-risk the rest of the plan. A spike = a quick prototype outside the main codebase that proves the hard part works.
+## 4. Risks + spikes
 
-### Spike A — WebRTC handshake over copy-paste (week 1)
+| Risk | Mitigation | Phase |
+|------|-----------|-------|
+| WebRTC copy-paste codes too large or too slow | Spike A in Week 1 | Week 1 |
+| NSPanel click-through doesn't work | Spike B in Week 2 | Week 2 |
+| Slack Socket Mode drops and doesn't reconnect | Spike C in Week 5 | Week 5 |
+| Notarization surprises | Dummy run in Week 1, real in Week 9 | W1 + W9 |
+| Pet art quality | Source original art in Week 3, not Week 10 | Week 3 |
+| macOS version churn | Test on 13, 14, 15 in Week 9 | Week 9 |
 
-Most of Phase 1 assumes copy-paste WebRTC is viable. If ICE gathering takes 30 seconds or the resulting invite codes are 20 KB, the UX story collapses. Spend half a day proving:
-
-- A complete ICE gathering round finishes in <5 seconds on a typical home network
-- Invite codes compress to <5 KB
-- A data channel actually opens between two separate processes
-
-If this spike fails, fall back to a tiny signaling relay before starting week 7.
-
-### Spike B — NSPanel click pass-through (week 2)
-
-Getting a full-screen overlay panel to pass clicks through everywhere except on the pet sprite is famously finicky. Prove the approach with a throwaway panel + one colored rectangle before building the real window. Reference implementations exist (see the DockDoor and Bezel projects for prior art).
-
-### Spike C — Slack Socket Mode reconnection (week 5)
-
-Socket Mode connections are dropped by Slack every ~4 hours. The adapter must transparently reconnect. Prove the reconnect loop works across a forced disconnect before wiring it into production code.
-
-### Other risks
-
-- **Notarization friction** — first notarization run always has surprises. Do a dummy notarization in week 1 to find issues early, not week 9.
-- **Pet art quality** — Kenney.nl assets get us to MVP but the pet needs charm for launch. Start sourcing original art in week 3; don't wait for week 10.
-- **macOS version churn** — target macOS 13+ for now; test on 14 and 15 in week 9.
+---
 
 ## 5. Post-MVP roadmap (Phase 2+)
 
-Captured here so the teammate knows what the architecture is bracing for:
+| Weeks | Focus |
+|-------|-------|
+| 11–14 | Signaling relay server (Hummingbird/Fly.io, ~150 LOC). Friendships persist across restarts. Offline queue with TTL. Still E2E; relay never sees payloads. |
+| 15–18 | Second species (cat). Treats distinct from toys. Close friends vs. friends. |
+| 19–24 | LottieRenderer. Semantic positioning (`.nearDock`, `.awayFromFocusedWindow`) via Accessibility API. |
+| 25+ | RiveRenderer. CloudKit identity sync. iOS companion (read-only pet viewer). |
 
-- **Week 11–14:** signaling relay server (~150 LOC Swift Hummingbird, deployed to Fly.io). Friendships persist across restarts. Offline message queue with TTL. Still E2E encrypted; server never sees payloads.
-- **Week 15–18:** second pet species (cat), forcing the factory abstraction to prove itself. Close friends vs. friends distinction. Treats (distinct from toys).
-- **Week 19–24:** LottieRenderer implementation. Semantic positioning (`.nearDock`, `.awayFromFocusedWindow`) via Accessibility APIs.
-- **Week 25+:** RiveRenderer, CloudKit identity sync, iOS companion (read-only pet viewer on iPhone that shows your Mac pet's status).
+---
 
-## 6. Getting started (for your teammate)
+## 6. Decision log
 
-```bash
-git clone https://github.com/<org>/petbuddy.git
-cd petbuddy
-open PetBuddy.xcodeproj
-
-# Run tests from the command line
-swift test
-
-# Validate the default pet pack
-swift run petpack-validate Pets/Goldie.petpack
-```
-
-**Environment requirements:**
-- macOS 13 Ventura or later
-- Xcode 15.2+
-- Swift 5.9+
-- (Optional) Homebrew for cask testing
-
-First issue to pick up as a warm-up: set up the `PetCore` package and write tests for `EventBus`. This touches the spine of the system and is a clean way to meet the codebase.
-
-## 7. Decision log (running)
-
-As decisions get made during the build, append here (don't edit history):
-
-- _2026-04-18_ — MVP defined as Telegram bot + Slack bot + P2P copy-paste, sprite-sheet renderer only. Lottie and Rive deferred to Phase 3/4.
-- _2026-04-18_ — Bot-only integration model chosen over user-client access (TDLib, Slack user tokens) for privacy and simplicity.
-- _2026-04-18_ — Open-source MIT, direct distribution via Developer ID + Homebrew. Mac App Store not pursued for v1.
+- _2026-04-18_ — MVP: Telegram bot + Slack bot + P2P copy-paste, SpriteSheetRenderer only. Lottie/Rive deferred to Phase 2/3.
+- _2026-04-18_ — Bot-only integrations. No user-client access (TDLib, Slack user tokens).
+- _2026-04-18_ — MIT open source, Developer ID + Homebrew. Mac App Store not pursued.
