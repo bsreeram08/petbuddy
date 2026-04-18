@@ -1,4 +1,5 @@
 import Foundation
+import PetCore
 
 public enum PetPackError: Error, LocalizedError {
     case fileNotFound
@@ -98,7 +99,7 @@ extension Species {
     }
 }
 
-public struct LoadedPetPack {
+public struct LoadedPetPack: Sendable {
     public let id: String
     public let species: Species
     public let displayName: String
@@ -117,4 +118,5 @@ public struct PetPackBlueprint: PetBlueprint {
     public var renderer: RendererKind { loaded.renderer }
     public var states: [StateKey: StateDescriptor] { loaded.states }
     public var sounds: [String: URL] { loaded.sounds }
+    public var packURL: URL { loaded.packURL }
 }

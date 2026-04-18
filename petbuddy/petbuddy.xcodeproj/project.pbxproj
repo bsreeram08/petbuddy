@@ -1,0 +1,595 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXContainerItemProxy section */
+		306A217F2F942ACB0009E003 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 306A21692F942ACA0009E003 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 306A21702F942ACA0009E003;
+			remoteInfo = petbuddy;
+		};
+		306A21892F942ACB0009E003 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 306A21692F942ACA0009E003 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 306A21702F942ACA0009E003;
+			remoteInfo = petbuddy;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		306A21712F942ACA0009E003 /* petbuddy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = petbuddy.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		306A217E2F942ACB0009E003 /* petbuddyTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = petbuddyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		306A21D82F942B4D0009E003 /* PetCore */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = PetCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		306A21D92F942B4D0009E003 /* PetPack */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = PetPack.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		306A21DA2F942B4D0009E003 /* SpriteSheetRenderer */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SpriteSheetRenderer.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		306A21DB2F942B4D0009E003 /* SlackBotAdapter */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SlackBotAdapter.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		306A21DC2F942B4D0009E003 /* TelegramBotAdapter */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = TelegramBotAdapter.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		306A21882F942ACB0009E003 /* petbuddyUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = petbuddyUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		306A22002F942B4D0009E003 /* Goldie.petpack */ = {isa = PBXFileReference; lastKnownFileType = folder; path = ../Pets/Goldie.petpack; sourceTree = SOURCE_ROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXBuildFile section */
+		306A22012F942B4D0009E003 /* Goldie.petpack in Resources */ = {
+			isa = PBXBuildFile;
+			fileRef = 306A22002F942B4D0009E003 /* Goldie.petpack */;
+		};
+/* End PBXBuildFile section */
+
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		306A21732F942ACA0009E003 /* petbuddy */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = petbuddy;
+			sourceTree = "<group>";
+		};
+		306A21812F942ACB0009E003 /* petbuddyTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = petbuddyTests;
+			sourceTree = "<group>";
+		};
+		306A218B2F942ACB0009E003 /* petbuddyUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = petbuddyUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		306A216E2F942ACA0009E003 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		306A217B2F942ACB0009E003 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		306A21852F942ACB0009E003 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		306A21682F942ACA0009E003 = {
+			isa = PBXGroup;
+			children = (
+				306A22002F942B4D0009E003 /* Goldie.petpack */,
+				306A21732F942ACA0009E003 /* petbuddy */,
+				306A21812F942ACB0009E003 /* petbuddyTests */,
+				306A218B2F942ACB0009E003 /* petbuddyUITests */,
+				306A21722F942ACA0009E003 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		306A21722F942ACA0009E003 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				306A21712F942ACA0009E003 /* petbuddy.app */,
+				306A217E2F942ACB0009E003 /* petbuddyTests.xctest */,
+				306A21882F942ACB0009E003 /* petbuddyUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		306A21702F942ACA0009E003 /* petbuddy */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 306A21922F942ACB0009E003 /* Build configuration list for PBXNativeTarget "petbuddy" */;
+			buildPhases = (
+				306A216D2F942ACA0009E003 /* Sources */,
+				306A216E2F942ACA0009E003 /* Frameworks */,
+				306A216F2F942ACA0009E003 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				306A21732F942ACA0009E003 /* petbuddy */,
+			);
+			name = petbuddy;
+			packageProductDependencies = (
+			);
+			productName = petbuddy;
+			productReference = 306A21712F942ACA0009E003 /* petbuddy.app */;
+			productType = "com.apple.product-type.application";
+		};
+		306A217D2F942ACB0009E003 /* petbuddyTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 306A21952F942ACB0009E003 /* Build configuration list for PBXNativeTarget "petbuddyTests" */;
+			buildPhases = (
+				306A217A2F942ACB0009E003 /* Sources */,
+				306A217B2F942ACB0009E003 /* Frameworks */,
+				306A217C2F942ACB0009E003 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				306A21802F942ACB0009E003 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				306A21812F942ACB0009E003 /* petbuddyTests */,
+			);
+			name = petbuddyTests;
+			packageProductDependencies = (
+			);
+			productName = petbuddyTests;
+			productReference = 306A217E2F942ACB0009E003 /* petbuddyTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		306A21872F942ACB0009E003 /* petbuddyUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 306A21982F942ACB0009E003 /* Build configuration list for PBXNativeTarget "petbuddyUITests" */;
+			buildPhases = (
+				306A21842F942ACB0009E003 /* Sources */,
+				306A21852F942ACB0009E003 /* Frameworks */,
+				306A21862F942ACB0009E003 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				306A218A2F942ACB0009E003 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				306A218B2F942ACB0009E003 /* petbuddyUITests */,
+			);
+			name = petbuddyUITests;
+			packageProductDependencies = (
+			);
+			productName = petbuddyUITests;
+			productReference = 306A21882F942ACB0009E003 /* petbuddyUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		306A21692F942ACA0009E003 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2620;
+				LastUpgradeCheck = 2620;
+				TargetAttributes = {
+					306A21702F942ACA0009E003 = {
+						CreatedOnToolsVersion = 26.2;
+					};
+					306A217D2F942ACB0009E003 = {
+						CreatedOnToolsVersion = 26.2;
+						TestTargetID = 306A21702F942ACA0009E003;
+					};
+					306A21872F942ACB0009E003 = {
+						CreatedOnToolsVersion = 26.2;
+						TestTargetID = 306A21702F942ACA0009E003;
+					};
+				};
+			};
+			buildConfigurationList = 306A216C2F942ACA0009E003 /* Build configuration list for PBXProject "petbuddy" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 306A21682F942ACA0009E003;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 306A21722F942ACA0009E003 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				306A21702F942ACA0009E003 /* petbuddy */,
+				306A217D2F942ACB0009E003 /* petbuddyTests */,
+				306A21872F942ACB0009E003 /* petbuddyUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		306A216F2F942ACA0009E003 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				306A22012F942B4D0009E003 /* Goldie.petpack in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		306A217C2F942ACB0009E003 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		306A21862F942ACB0009E003 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		306A216D2F942ACA0009E003 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		306A217A2F942ACB0009E003 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		306A21842F942ACB0009E003 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+
+/* Begin PBXTargetDependency section */
+		306A21802F942ACB0009E003 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 306A21702F942ACA0009E003 /* petbuddy */;
+			targetProxy = 306A217F2F942ACB0009E003 /* PBXContainerItemProxy */;
+		};
+		306A218A2F942ACB0009E003 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 306A21702F942ACA0009E003 /* petbuddy */;
+			targetProxy = 306A21892F942ACB0009E003 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		306A21902F942ACB0009E003 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = W2FUFGH48B;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.2;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		306A21912F942ACB0009E003 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = W2FUFGH48B;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		306A21932F942ACB0009E003 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = W2FUFGH48B;
+				ENABLE_APP_SANDBOX = NO;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = in.sreerams.petbuddy;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		306A21942F942ACB0009E003 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = W2FUFGH48B;
+				ENABLE_APP_SANDBOX = NO;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = in.sreerams.petbuddy;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		306A21962F942ACB0009E003 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = W2FUFGH48B;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = in.sreerams.petbuddyTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/petbuddy.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/petbuddy";
+			};
+			name = Debug;
+		};
+		306A21972F942ACB0009E003 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = W2FUFGH48B;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = in.sreerams.petbuddyTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/petbuddy.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/petbuddy";
+			};
+			name = Release;
+		};
+		306A21992F942ACB0009E003 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = W2FUFGH48B;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = in.sreerams.petbuddyUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = petbuddy;
+			};
+			name = Debug;
+		};
+		306A219A2F942ACB0009E003 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = W2FUFGH48B;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = in.sreerams.petbuddyUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TEST_TARGET_NAME = petbuddy;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		306A216C2F942ACA0009E003 /* Build configuration list for PBXProject "petbuddy" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				306A21902F942ACB0009E003 /* Debug */,
+				306A21912F942ACB0009E003 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		306A21922F942ACB0009E003 /* Build configuration list for PBXNativeTarget "petbuddy" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				306A21932F942ACB0009E003 /* Debug */,
+				306A21942F942ACB0009E003 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		306A21952F942ACB0009E003 /* Build configuration list for PBXNativeTarget "petbuddyTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				306A21962F942ACB0009E003 /* Debug */,
+				306A21972F942ACB0009E003 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		306A21982F942ACB0009E003 /* Build configuration list for PBXNativeTarget "petbuddyUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				306A21992F942ACB0009E003 /* Debug */,
+				306A219A2F942ACB0009E003 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 306A21692F942ACA0009E003 /* Project object */;
+}

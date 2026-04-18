@@ -7,6 +7,7 @@ public protocol PetBlueprint: Sendable {
     var renderer: RendererKind { get }
     var states: [StateKey: StateDescriptor] { get }
     var sounds: [String: URL] { get }
+    var packURL: URL { get }
 }
 
 public struct StateDescriptor: Codable, Sendable {

@@ -1,4 +1,6 @@
 import AppKit
+import CoreGraphics
+import PetCore
 
 /// NSView that renders pet animations via Timer-driven frame stepping.
 /// No CVDisplayLink, no CAAnimation — purely main-thread Timer.
@@ -102,20 +104,20 @@ public final class SpriteView: NSView {
 
     private func extractFrame(_ globalIndex: Int) -> CGImage? {
         let sheetURL = packURL.appendingPathComponent("assets/sheet.png")
-        guard let sheet = NSImage(contentsOfFile: sheetURL.path),
-              let tiff = sheet.tiffRepresentation,
-              let atlas = NSBitmapImageRep(data: tiff) else { return nil }
+        guard let sheet = NSImage(contentsOf: sheetURL),
+              let cgImage = sheet.cgImage(forProposedRect: nil, context: nil, hints: nil) else { return nil }
 
-        let columns = atlas.pixelsWide / frameWidth
+        let columns = Int(cgImage.width) / frameWidth
         let row = globalIndex / columns
         let col = globalIndex % columns
 
         let rect = CGRect(
-            x: col * frameWidth,
-            y: atlas.pixelsHigh - (row + 1) * frameHeight,
-            width: frameWidth,
-            height: frameHeight
+            x: CGFloat(col * frameWidth),
+            y: CGFloat(Int(cgImage.height) - (row + 1) * frameHeight),
+            width: CGFloat(frameWidth),
+            height: CGFloat(frameHeight)
         )
-        return atlas.cropping(to: rect)
+        return cgImage.cropping(to: rect)
+
     }
 }

@@ -1,10 +1,11 @@
-import AppKit
 import Foundation
+import AppKit
+import PetCore
 
 public final class SpriteSheetRenderer: AnimationRenderer {
     public typealias RendererView = SpriteView
 
-    private let pack: PetPack.PetPackBlueprint
+    private let pack: any PetBlueprint
     private let frameWidth: Int
     private let frameHeight: Int
 
@@ -12,7 +13,7 @@ public final class SpriteSheetRenderer: AnimationRenderer {
         CGSize(width: CGFloat(frameWidth), height: CGFloat(frameHeight))
     }
 
-    public init(pack: PetPack.PetPackBlueprint) throws {
+    public init(pack: any PetBlueprint) throws {
         self.pack = pack
 
         let framesURL = pack.packURL.appendingPathComponent("assets/frames.json")
@@ -30,7 +31,7 @@ public final class SpriteSheetRenderer: AnimationRenderer {
             frameWidth: frameWidth,
             frameHeight: frameHeight,
             states: pack.states,
-            initialState: .idle,
+            initialState: StateKey.idle,
             packURL: pack.packURL
         )
     }

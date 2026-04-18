@@ -57,7 +57,9 @@ final class PetPackTests: XCTestCase {
     }
 
     func testMissingRequiredFieldThrows() throws {
-        let manifest = """{ "id": "com.test.puppy", "species": "puppy" }"""
+        let manifest = """
+        { "id": "com.test.puppy", "species": "puppy" }
+        """
         let manifestURL = tempDir.appendingPathComponent("manifest.json")
         try manifest.write(to: manifestURL, atomically: true, encoding: .utf8)
         let loader = ManifestLoader()

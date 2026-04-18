@@ -1,10 +1,10 @@
-import AppKit
 import Foundation
+import AppKit
 
 public protocol AnimationRenderer: AnyObject {
     associatedtype RendererView: NSView
 
-    init(pack: PetPack.PetPackBlueprint) throws
+    init(pack: any PetBlueprint) throws
     func makeView() -> RendererView
     func transition(to state: StateKey, animated: Bool)
     func trigger(_ event: String)

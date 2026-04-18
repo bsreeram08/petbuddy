@@ -12,24 +12,17 @@ let package = Package(
         .library(name: "TelegramBotAdapter", targets: ["TelegramBotAdapter"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/kishikawakatsumi/KeychainAccess", from: "4.2.2"),
     ],
     targets: [
-        .target(name: "PetCore", dependencies: []),
-        .testTarget(name: "PetCoreTests", dependencies: ["PetCore"]),
+        .target(name: "PetCore", path: "Packages/PetCore/Sources/PetCore"),
+        .testTarget(name: "PetCoreTests", dependencies: ["PetCore"], path: "Packages/PetCore/Tests/PetCoreTests"),
 
-        .target(name: "PetPack", dependencies: ["PetCore"]),
-        .testTarget(name: "PetPackTests", dependencies: ["PetPack"]),
+        .target(name: "PetPack", dependencies: ["PetCore"], path: "Packages/PetPack/Sources/PetPack"),
+        .testTarget(name: "PetPackTests", dependencies: ["PetPack"], path: "Packages/PetPack/Tests/PetPackTests"),
 
-        .target(name: "SpriteSheetRenderer", dependencies: ["PetCore", "PetPack"]),
+        .target(name: "SpriteSheetRenderer", dependencies: ["PetCore", "PetPack"], path: "Packages/Renderers/SpriteSheetRenderer/Sources/SpriteSheetRenderer"),
 
-        .target(name: "SlackBotAdapter", dependencies: ["PetCore"]),
-        .target(name: "TelegramBotAdapter", dependencies: ["PetCore"]),
-
-        .target(name: "PetBuddyApp", dependencies: [
-            "PetCore", "PetPack", "SpriteSheetRenderer",
-            "SlackBotAdapter", "TelegramBotAdapter",
-            .product(name: "KeychainAccess", package: "KeychainAccess"),
-        ]),
+        .target(name: "SlackBotAdapter", dependencies: ["PetCore"], path: "Packages/Integrations/SlackBot/Sources/SlackBotAdapter"),
+        .target(name: "TelegramBotAdapter", dependencies: ["PetCore"], path: "Packages/Integrations/TelegramBot/Sources/TelegramBotAdapter"),
     ]
 )

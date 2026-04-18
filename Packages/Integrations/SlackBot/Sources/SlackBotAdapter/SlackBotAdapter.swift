@@ -1,6 +1,7 @@
 import Foundation
+import PetCore
 
-public actor SlackBotAdapter: IntegrationAdapter {
+public final class SlackBotAdapter: IntegrationAdapter {
     public static var identifier: String { "slack.bot" }
     public static var displayName: String { "Slack" }
 
@@ -30,7 +31,7 @@ public actor SlackBotAdapter: IntegrationAdapter {
     public func connect() async throws {
         _status = .connecting
 
-        let url = URL(string: "https:// slack.com/api/apps.connections.open")!
+        let url = URL(string: "https://slack.com/api/apps.connections.open")!
         var req = URLRequest(url: url)
         req.httpMethod = "POST"
         req.setValue("Bearer \(appToken)", forHTTPHeaderField: "Authorization")

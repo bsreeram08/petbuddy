@@ -8,9 +8,9 @@ final class FakeTimerProvider: TimerProvider {
 
     public func schedule(
         interval: TimeInterval,
-        @MainActor action: @escaping @Sendable () -> Void
+        action: @escaping @Sendable () -> Void
     ) -> any Cancellable {
-        actions.append { Task { @MainActor in action() } }
+        actions.append(action)
         return FakeCancellable { [weak self] in self?.actions.removeAll() }
     }
 
@@ -128,7 +128,8 @@ final class EventBusTests: XCTestCase {
         bus.emit(.userClicked)
         bus.emit(.userClicked)
         bus.finish()
-        XCTAssertEqual(await task.value.count, 3)
+        let received = await task.value
+        XCTAssertEqual(received.count, 3)
     }
 
     func testMultipleEmits() async {
@@ -140,6 +141,7 @@ final class EventBusTests: XCTestCase {
         }
         for _ in 0..<10 { bus.emit(.userClicked) }
         bus.finish()
-        XCTAssertEqual(await task.value, 10)
+        let count = await task.value
+        XCTAssertEqual(count, 10)
     }
 }

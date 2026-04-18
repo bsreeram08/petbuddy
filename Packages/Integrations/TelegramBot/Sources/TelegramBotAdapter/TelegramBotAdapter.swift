@@ -1,6 +1,7 @@
 import Foundation
+import PetCore
 
-public actor TelegramBotAdapter: IntegrationAdapter {
+public final class TelegramBotAdapter: IntegrationAdapter {
     public static var identifier: String { "telegram.bot" }
     public static var displayName: String { "Telegram" }
 
@@ -63,7 +64,7 @@ public actor TelegramBotAdapter: IntegrationAdapter {
     }
 
     private func getUpdates(timeout: Int) async throws -> [TelegramUpdate] {
-        var components = URLComponents(string: "https:// api.telegram.org/bot\(token)/getUpdates")!
+        var components = URLComponents(string: "https://api.telegram.org/bot\(token)/getUpdates")!
         components.queryItems = [
             URLQueryItem(name: "timeout", value: String(timeout)),
             URLQueryItem(name: "offset", value: String(offset)),

@@ -1,16 +1,17 @@
 import Foundation
 
-public protocol TimerProvider: Sendable {
-    func schedule(interval: TimeInterval, @MainActor action: @escaping @Sendable () -> Void) -> any Cancellable
+public protocol TimerProvider {
+    func schedule(interval: TimeInterval, action: @escaping @Sendable () -> Void) -> any Cancellable
 }
 
-public protocol Cancellable: Sendable {
+public protocol Cancellable {
     func cancel()
 }
 
 public final class RealTimerProvider: TimerProvider {
     public init() {}
-    public func schedule(interval: TimeInterval, @MainActor action: @escaping @Sendable () -> Void) -> any Cancellable {
+
+    public func schedule(interval: TimeInterval, action: @escaping @Sendable () -> Void) -> any Cancellable {
         let timer = Timer.scheduledTimer(withTimeInterval: interval, repeats: true) { _ in
             Task { @MainActor in action() }
         }
@@ -19,7 +20,7 @@ public final class RealTimerProvider: TimerProvider {
 }
 
 private final class TimerCancellable: Cancellable {
-        private let timer: Timer
-        fileprivate init(timer: Timer) { self.timer = timer }
-        func cancel() { timer.invalidate() }
+    private weak var timer: Timer?
+    fileprivate init(timer: Timer) { self.timer = timer }
+    func cancel() { timer?.invalidate() }
 }

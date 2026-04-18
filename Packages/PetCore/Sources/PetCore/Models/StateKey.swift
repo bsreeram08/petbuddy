@@ -6,9 +6,9 @@ public struct StateKey: RawRepresentable, Hashable, Sendable {
 }
 
 public extension StateKey {
-    static let idle  = StateKey("idle")
-    static let walk  = StateKey("walk")
-    static let happy = StateKey("happy")
-    static let sleep = StateKey("sleep")
-    static let alert = StateKey("alert")
+    static let idle  = StateKey(rawValue: "idle")
+    static let walk  = StateKey(rawValue: "walk")
+    static let happy = StateKey(rawValue: "happy")
+    static let sleep = StateKey(rawValue: "sleep")
+    static let alert = StateKey(rawValue: "alert")
 }

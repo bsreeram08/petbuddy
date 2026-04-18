@@ -1,6 +1,6 @@
 import Foundation
 
-public protocol IntegrationAdapter: AnyObject, Sendable {
+public protocol IntegrationAdapter: AnyObject {
     static var identifier: String { get }
     static var displayName: String { get }
 
