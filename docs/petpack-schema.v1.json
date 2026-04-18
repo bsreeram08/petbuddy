@@ -1,0 +1,107 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "PetBuddy Pet Pack Manifest v1",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "id",
+    "species",
+    "displayName",
+    "renderer",
+    "states"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "const": 1
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9._-]+$"
+    },
+    "species": {
+      "type": "string",
+      "minLength": 1
+    },
+    "displayName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "author": {
+      "type": "string"
+    },
+    "license": {
+      "type": "string"
+    },
+    "renderer": {
+      "type": "string",
+      "enum": [
+        "spritesheet",
+        "lottie",
+        "rive"
+      ]
+    },
+    "states": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "fps"
+        ],
+        "properties": {
+          "frames": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "minItems": 1
+          },
+          "fps": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 60
+          },
+          "loop": {
+            "type": "boolean"
+          }
+        },
+        "allOf": [
+          {
+            "required": [
+              "frames"
+            ]
+          }
+        ]
+      }
+    },
+    "sounds": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "personality": {
+      "type": "object",
+      "properties": {
+        "baseState": {
+          "type": "string"
+        },
+        "walkSpeed": {
+          "type": "number",
+          "minimum": 1
+        },
+        "reactRange": {
+          "type": "number",
+          "minimum": 1
+        },
+        "friendlinessToStrangers": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    }
+  }
+}
