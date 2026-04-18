@@ -1,1 +1,2 @@
-// Placeholder — protocols and models defined in DESIGN.md
+// PetCore — dependency-free foundation for PetBuddy
+public enum PetCore {}
